@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Football Match Predictor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: url({{ url_for('static', filename='lec.jpg') }}) no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Changed from center to start to allow more room for scrolling */
+            height: 100vh;
+            font-size: 16px;
+            overflow: auto; /* Allow scrolling */
+        }
+
+    .container {
+        background: rgba(0, 0, 0, 0.7);
+        border-radius: 12px;
+        padding: 30px;
+        width: 90%;
+        max-width: 900px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+        margin-top: 30px; /* Add top margin to ensure space for content */
+    }
+
+        h1 {
+            text-align: center;
+            font-size: 36px;
+            color: #2980b9; /* Changed to electric blue */
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px; /* Ensure enough space after form for results */
+        }
+
+        label {
+            font-size: 18px;
+            color: #fff;
+        }
+
+        select, input[type="text"] {
+            padding: 15px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            outline: none;
+            width: 100%;
+            transition: all 0.3s ease-in-out;
+        }
+
+        select:hover, input[type="text"]:hover {
+            background-color: #2980b9; /* Changed to electric blue */
+            color: white;
+        }
+
+        select:focus, input[type="text"]:focus {
+            border: 2px solid #2980b9; /* Changed to electric blue */
+        }
+
+        button {
+            background-color: #2980b9; /* Changed to electric blue */
+            color: white;
+            padding: 15px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        button:hover {
+        background-color: #3498db; /* Lighter blue for hover */
+        transform: translateY(-2px);
+    }   
+
+        .error {
+            color: #ff4444;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #2c3e50;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+            margin-bottom: 30px; /* Add margin at the bottom of the results for proper spacing */
+        }
+
+        .result.success {
+            background-color: #27ae60; /* Vibrant green for success */
+        }
+
+        .result p {
+            font-size: 20px;
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+
+        .result strong {
+            color: #fff;
+            font-size: 22px;
+        }
+
+    .chart {
+        margin-top: 40px;
+        text-align: center;
+        margin-bottom: 30px; /* Add margin at the bottom of the chart section */
+    }
+
+        .chart img {
+            max-width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Make the layout responsive */
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            input[type="text"], select, button {
+                font-size: 16px;
+            }
+
+            .result p {
+                font-size: 18px;
+            }
+        }
+
+        /* Add a pulse animation to the submit button */
+        button:active {
+            transform: scale(0.98);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Football Match Predictor</h1>
+        <form method="POST" action="/predict" id="predictionForm">
+            <label for="dataset">Select Dataset:</label>
+            <select id="dataset" name="dataset" required>
+                <option value="pl">Premier League (PL)</option>
+                <option value="uefa">UEFA</option>
+                <option value="world cup">World Cup</option>
+            </select>
+
+            <label for="team1">Enter Team 1 Name:</label>
+            <input type="text" id="team1" name="team1" required>
+
+            <label for="team2">Enter Team 2 Name:</label>
+            <input type="text" id="team2" name="team2" required>
+            <br>
+            <button type="submit" onclick="resetForm()">Predict</button>
+        </form>
+
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+
+        {% if prediction %}
+        <div class="result success">
+            <p><strong>Predicted Winner:</strong> {{ prediction.winner }}</p>
+            <p><strong>{{ prediction.team1 }} Probability:</strong> {{ prediction.team1_prob | round(2) }}%</p>
+            <p><strong>{{ prediction.team2 }} Probability:</strong> {{ prediction.team2_prob | round(2) }}%</p>
+        </div>
+
+        <div class="chart">
+            <h3>Game Progression:</h3>
+            <img src="/chart/{{ prediction.team1 }}/{{ prediction.team2 }}" alt="Game Progression Chart">
+        </div>
+        {% endif %}
+    </div>
+
+</body>
+</html>

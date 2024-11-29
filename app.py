@@ -7,8 +7,11 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 import numpy as np
+import logging
 
 app = Flask(__name__, static_folder='static')
+
+logging.basicConfig(filename='visitor_ips.log', level=logging.INFO, format='%(asctime)s - %(message)s')
 
 datasets = {
     "pl": "pl.csv",
@@ -42,6 +45,10 @@ def train_model(dataset_name):
 
 @app.route("/")
 def home():
+    user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+
+    app.logger.info(f'Visitor IP: {user_ip}')
+
     return render_template("index.html")
 
 @app.route("/predict", methods=["POST"])
